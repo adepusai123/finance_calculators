@@ -15,7 +15,7 @@ class RDCalculation {
 
   double calculate() {
     double value = 0;
-    for (int i = 0; i < months; i++) {
+    for (double i = 0; i < months; i++) {
       CompoundCalculation cc = new CompoundCalculation(
         principle: principle,
         cTimes: cTimes,

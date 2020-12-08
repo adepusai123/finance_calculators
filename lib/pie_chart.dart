@@ -1,3 +1,5 @@
+import 'package:finance_calulator/models/chart_model.dart';
+
 /// Bar chart with example of a legend with customized position, justification,
 /// desired max rows, and padding. These options are shown as an example of how
 /// to use the customizations, they do not necessary have to be used together in
@@ -15,8 +17,7 @@ class DatumLegendWithMeasures extends StatelessWidget {
 
   DatumLegendWithMeasures(this.seriesList, {this.animate});
 
-  factory DatumLegendWithMeasures.withSampleData(
-      List<Map<String, dynamic>> data) {
+  factory DatumLegendWithMeasures.withSampleData(List<ChartData> data) {
     return new DatumLegendWithMeasures(
       _createSampleData(data),
       // Disable animations for image tests.
@@ -61,28 +62,16 @@ class DatumLegendWithMeasures extends StatelessWidget {
   }
 
   /// Create series list with one series
-  static List<charts.Series<Savings, String>> _createSampleData(
-      List<Map<String, dynamic>> values) {
-    final data = values
-        .map((o) => new Savings(type: o['type'], amount: o['amount']))
-        .toList();
+  static List<charts.Series<ChartData, String>> _createSampleData(values) {
     return [
-      new charts.Series<Savings, String>(
+      new charts.Series<ChartData, String>(
         id: 'deposits',
-        domainFn: (Savings deposits, _) => deposits.type,
-        measureFn: (Savings deposits, _) => deposits.amount,
+        domainFn: (ChartData deposits, _) => deposits.type,
+        measureFn: (ChartData deposits, _) => deposits.amount,
         colorFn: (_, index) =>
             charts.MaterialPalette.indigo.makeShades(values.length)[index],
-        data: data,
+        data: values,
       )
     ];
   }
-}
-
-/// Sample linear data type.
-class Savings {
-  final String type;
-  final int amount;
-
-  Savings({this.type, this.amount});
 }

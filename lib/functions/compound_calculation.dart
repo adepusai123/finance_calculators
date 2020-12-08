@@ -2,13 +2,12 @@ import 'dart:math';
 
 class CompoundCalculation {
   double roi;
-  int months;
+  double months;
   double principle;
   int cTimes;
   double maturity;
 
   CompoundCalculation({this.principle, this.cTimes, this.months, this.roi});
-
   double monthsToYears() {
     return months / 12;
   }

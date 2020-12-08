@@ -1,15 +1,35 @@
+import 'package:finance_calulator/components/custom_button.dart';
+import 'package:finance_calulator/components/custom_text_field.dart';
+import 'package:finance_calulator/components/label_text.dart';
+import 'package:finance_calulator/functions/compound_calculation.dart';
+import 'package:finance_calulator/models/chart_model.dart';
 import 'package:finance_calulator/utils/styles.dart';
 import 'package:flutter/material.dart';
 
 import '../pie_chart.dart';
 
-class FdScreen extends StatelessWidget {
+class FdScreen extends StatefulWidget {
   const FdScreen({
     Key key,
     @required this.name,
   }) : super(key: key);
 
   final String name;
+
+  @override
+  _FdScreenState createState() => _FdScreenState();
+}
+
+class _FdScreenState extends State<FdScreen> {
+  TextEditingController monthsCtrl = new TextEditingController();
+  TextEditingController roiCtrl = new TextEditingController();
+  TextEditingController prinCtrl = new TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  List<ChartData> dataSet = [];
+  double tA;
+  double tI;
+  double tP;
+  bool showResult = false;
 
   @override
   Widget build(BuildContext context) {
@@ -19,161 +39,173 @@ class FdScreen extends StatelessWidget {
       height: size.height,
       color: Styles.bgColor,
       child: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: 10),
-            CustomNumberInput(hintText: "No of Months"),
-            CustomNumberInput(hintText: "Rate of Interest"),
-            CustomNumberInput(hintText: "Deposit Amount"),
-            CustomButton(),
-            SizedBox(
-              height: size.width * 0.5,
-              child: Container(
-                // color: Colors.red,
-                padding: EdgeInsets.all(15),
-                child: DatumLegendWithMeasures.withSampleData([
-                  {"type": "Principle", "amount": 5000},
-                  {"type": "Interest", "amount": 200}
-                ]),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              SizedBox(height: 10),
+              CustomNumberInput(
+                hintText: "No of Months",
+                controller: monthsCtrl,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Please enter some text';
+                  }
+                  validateNumberField(value, monthsCtrl);
+                },
               ),
-            ),
-            SizedBox(
-              width: size.width * 0.8,
-              child: Container(
-                padding: EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  border: Border.all(color: Styles.darkColor),
-                  color: Styles.cardColor,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.blueGrey,
-                      spreadRadius: 1,
-                      blurRadius: 0.6,
-                    )
-                  ],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    LabelTextAmount(
-                      label: 'Deposited:',
-                      amount: 10000,
-                    ),
-                    LabelTextAmount(
-                      label: 'Interest:',
-                      amount: 1000,
-                    ),
-                    Divider(
-                      thickness: 2,
-                      color: Styles.darkColor,
-                    ),
-                    LabelTextAmount(
-                      label: 'Maturity:',
-                      amount: 11000,
-                    ),
-                  ],
-                ),
+              CustomNumberInput(
+                hintText: "Rate of Interest",
+                controller: roiCtrl,
+                validator: (String value) {
+                  if (value.isEmpty) {
+                    return 'Please enter some text';
+                  }
+                  validateNumberField(value, roiCtrl);
+                },
               ),
-            )
-          ],
+              CustomNumberInput(
+                hintText: "Deposit Amount",
+                controller: prinCtrl,
+                validator: (String value) {
+                  if (value.isEmpty) {
+                    return 'Please enter some text';
+                  }
+                  validateNumberField(value, roiCtrl);
+                },
+              ),
+              CustomButton(
+                label: 'Calculate',
+                press: () {
+                  setState(() {
+                    dataSet = [];
+                  });
+                  FocusScope.of(context)
+                      .requestFocus(FocusNode()); // close keyboard on click
+                  if (_formKey.currentState.validate()) {
+                    tP = stringToNumber(prinCtrl.text);
+                    CompoundCalculation calc = new CompoundCalculation(
+                      roi: stringToNumber(roiCtrl.text),
+                      months: stringToNumber(monthsCtrl.text),
+                      principle: tP,
+                      cTimes: 4,
+                    );
+                    tA = calc.calcMaturity();
+                    tI = tA - stringToNumber(prinCtrl.text);
+                    ChartData dataP =
+                        new ChartData(type: "Deposite", amount: tP);
+                    dataSet.add(dataP);
+                    ChartData dataI =
+                        new ChartData(type: "Interest", amount: tI);
+                    dataSet.add(dataI);
+                    if (dataSet.length > 0) {
+                      setState(() {
+                        showResult = true;
+                      });
+                    }
+                  }
+                },
+              ),
+              ...showResult
+                  ? [
+                      SizedBox(
+                        height: size.width * 0.5,
+                        child: Container(
+                          padding: EdgeInsets.all(15),
+                          child:
+                              DatumLegendWithMeasures.withSampleData(dataSet),
+                        ),
+                      ),
+                      ResultCard(a: tA, p: tP, i: tI),
+                      CustomButton(
+                        label: 'Clear',
+                        press: () {
+                          setState(() {
+                            dataSet = [];
+                            showResult = false;
+                            monthsCtrl.clear();
+                            roiCtrl.clear();
+                            prinCtrl.clear();
+                          });
+                        },
+                      )
+                    ]
+                  : []
+            ],
+          ),
         ),
       ),
     );
   }
-}
 
-class LabelTextAmount extends StatelessWidget {
-  const LabelTextAmount({
-    Key key,
-    this.label,
-    this.amount,
-  }) : super(key: key);
+  validateNumberField(String val, TextEditingController ctrl) {
+    try {
+      double.parse(val);
+      // ctrl.text = val;
+    } catch (e) {
+      return 'Enter number only';
+    }
+    return null;
+  }
 
-  final String label;
-  final double amount;
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(5.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: Styles.greyTextColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-          Text(
-            '$amount',
-            style: TextStyle(
-              color: Styles.darkColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-        ],
-      ),
-    );
+  stringToNumber(val) {
+    return double.parse(val);
   }
 }
 
-class CustomButton extends StatelessWidget {
-  const CustomButton({
+class ResultCard extends StatelessWidget {
+  const ResultCard({
     Key key,
+    this.p,
+    this.i,
+    this.a,
   }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Styles.darkColor,
-      ),
-      child: FlatButton(
-        onPressed: null,
-        child: Text(
-          'Calculate',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-    );
-  }
-}
-
-class CustomNumberInput extends StatelessWidget {
-  const CustomNumberInput({
-    Key key,
-    @required this.hintText,
-  }) : super(key: key);
-
-  final String hintText;
+  final double p;
+  final double i;
+  final double a;
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Container(
-      width: size.width * 0.9,
-      margin: EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white54,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        child: TextFormField(
-          decoration: InputDecoration(
-            hintText: hintText,
-            border: InputBorder.none,
-          ),
-          keyboardType: TextInputType.number,
+    return SizedBox(
+      width: size.width * 0.8,
+      child: Container(
+        padding: EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          shape: BoxShape.rectangle,
+          border: Border.all(color: Styles.darkColor),
+          color: Styles.cardColor,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.blueGrey,
+              spreadRadius: 1,
+              blurRadius: 0.6,
+            )
+          ],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            LabelTextAmount(
+              label: 'Deposited:',
+              amount: p,
+            ),
+            LabelTextAmount(
+              label: 'Interest:',
+              amount: i,
+            ),
+            Divider(
+              thickness: 2,
+              color: Styles.darkColor,
+            ),
+            LabelTextAmount(
+              label: 'Maturity:',
+              amount: a,
+            ),
+          ],
         ),
       ),
     );
