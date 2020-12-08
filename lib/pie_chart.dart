@@ -53,7 +53,7 @@ class DatumLegendWithMeasures extends StatelessWidget {
           // Optionally provide a measure formatter to format the measure value.
           // If none is specified the value is formatted as a decimal.
           measureFormatter: (num value) {
-            return value == null ? '-' : '${value}k';
+            return value == null ? '-' : '$value';
           },
         ),
       ],
@@ -71,7 +71,8 @@ class DatumLegendWithMeasures extends StatelessWidget {
         id: 'deposits',
         domainFn: (Savings deposits, _) => deposits.type,
         measureFn: (Savings deposits, _) => deposits.amount,
-        // colorFn: (_, __) => charts.MaterialPalette.purple.shadeDefault,
+        colorFn: (_, index) =>
+            charts.MaterialPalette.indigo.makeShades(values.length)[index],
         data: data,
       )
     ];
