@@ -18,27 +18,105 @@ class FdScreen extends StatelessWidget {
       width: double.infinity,
       height: size.height,
       color: Styles.bgColor,
-      child: Column(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 10),
+            CustomNumberInput(hintText: "No of Months"),
+            CustomNumberInput(hintText: "Rate of Interest"),
+            CustomNumberInput(hintText: "Deposit Amount"),
+            CustomButton(),
+            SizedBox(
+              height: size.width * 0.5,
+              child: Container(
+                // color: Colors.red,
+                padding: EdgeInsets.all(15),
+                child: DatumLegendWithMeasures.withSampleData([
+                  {"type": "Principle", "amount": 5000},
+                  {"type": "Interest", "amount": 200}
+                ]),
+              ),
+            ),
+            SizedBox(
+              width: size.width * 0.8,
+              child: Container(
+                padding: EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  border: Border.all(color: Styles.darkColor),
+                  color: Styles.cardColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blueGrey,
+                      spreadRadius: 1,
+                      blurRadius: 0.6,
+                    )
+                  ],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    LabelTextAmount(
+                      label: 'Deposited:',
+                      amount: 10000,
+                    ),
+                    LabelTextAmount(
+                      label: 'Interest:',
+                      amount: 1000,
+                    ),
+                    Divider(
+                      thickness: 2,
+                      color: Styles.darkColor,
+                    ),
+                    LabelTextAmount(
+                      label: 'Maturity:',
+                      amount: 11000,
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class LabelTextAmount extends StatelessWidget {
+  const LabelTextAmount({
+    Key key,
+    this.label,
+    this.amount,
+  }) : super(key: key);
+
+  final String label;
+  final double amount;
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          SizedBox(height: 10),
-          CustomNumberInput(hintText: "No of Months"),
-          CustomNumberInput(hintText: "Rate of Interest"),
-          CustomNumberInput(hintText: "Deposit Amount"),
-          CustomButton(),
-          SizedBox(
-            height: size.width * 0.5,
-            child: Container(
-              // color: Colors.red,
-              padding: EdgeInsets.all(15),
-              child: DatumLegendWithMeasures.withSampleData([
-                {"type": "Principle", "amount": 5000},
-                {"type": "Interest", "amount": 200}
-              ]),
+          Text(
+            label,
+            style: TextStyle(
+              color: Styles.greyTextColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
             ),
           ),
-          Container(
-            child: Text('Total Amount:'),
-          )
+          Text(
+            '$amount',
+            style: TextStyle(
+              color: Styles.darkColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
         ],
       ),
     );
