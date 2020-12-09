@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
       title: 'Finance Calculator',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        fontFamily: 'BerkshireSwash-Regular',
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
