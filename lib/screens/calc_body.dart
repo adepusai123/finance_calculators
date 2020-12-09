@@ -33,11 +33,6 @@ class CalcBodyScreen extends StatelessWidget {
   }
 
   buildShowScreenById(String id) {
-    if (id == "EMI") {
-      // return EmiScreen(name: "EMI");
-      return Container();
-    } else {
-      return FdScreen(id: id);
-    }
+    return FdScreen(id: id);
   }
 }

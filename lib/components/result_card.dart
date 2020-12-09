@@ -52,7 +52,7 @@ class ResultCard extends StatelessWidget {
               color: Styles.darkColor,
             ),
             LabelTextAmount(
-              label: 'Maturity:',
+              label: 'Total:',
               amount: a,
             ),
           ],
