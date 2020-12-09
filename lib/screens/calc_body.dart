@@ -1,8 +1,7 @@
 import 'package:finance_calulator/utils/styles.dart';
 import 'package:flutter/material.dart';
 
-import 'dd_screen.dart';
-import 'emi_screen.dart';
+// import 'emi_screen.dart';
 import 'fd_screen.dart';
 
 class CalcBodyScreen extends StatelessWidget {
@@ -34,19 +33,11 @@ class CalcBodyScreen extends StatelessWidget {
   }
 
   buildShowScreenById(String id) {
-    switch (id) {
-      case "FD":
-        return FdScreen(name: "Fixed", id: id);
-        break;
-      case "RD":
-        return FdScreen(name: "Recurrence", id: id);
-        break;
-      case "DD":
-        return DdScreen(name: "Daily");
-        break;
-      case "EMI":
-        return EmiScreen(name: "EMI");
-        break;
+    if (id == "EMI") {
+      // return EmiScreen(name: "EMI");
+      return Container();
+    } else {
+      return FdScreen(id: id);
     }
   }
 }

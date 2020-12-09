@@ -1,6 +1,6 @@
 import 'package:finance_calulator/components/custom_button.dart';
 import 'package:finance_calulator/components/custom_text_field.dart';
-import 'package:finance_calulator/components/label_text.dart';
+import 'package:finance_calulator/components/result_card.dart';
 import 'package:finance_calulator/functions/compound_calculation.dart';
 import 'package:finance_calulator/functions/reccurence_calculation.dart';
 import 'package:finance_calulator/models/calc_model.dart';
@@ -13,11 +13,9 @@ import '../pie_chart.dart';
 class FdScreen extends StatefulWidget {
   const FdScreen({
     Key key,
-    @required this.name,
     @required this.id,
   }) : super(key: key);
 
-  final String name;
   final String id;
 
   @override
@@ -70,7 +68,7 @@ class _FdScreenState extends State<FdScreen> {
                 },
               ),
               CustomNumberInput(
-                hintText: id == "FD" ? "Deposit Amount" : "Monthly Deposit",
+                hintText: "Deposit Amount",
                 controller: prinCtrl,
                 validator: (String value) {
                   if (value.isEmpty) {
@@ -82,13 +80,12 @@ class _FdScreenState extends State<FdScreen> {
               CustomButton(
                 label: 'Calculate',
                 press: () {
+                  FocusScope.of(context)
+                      .requestFocus(FocusNode()); // close keyboard on click
                   setState(() {
                     dataSet = [];
                   });
-                  FocusScope.of(context)
-                      .requestFocus(FocusNode()); // close keyboard on click
                   if (_formKey.currentState.validate()) {
-                    tP = stringToNumber(prinCtrl.text);
                     if (id == 'FD') {
                       CalcModel data = new CalcModel.fromJson({
                         "roi": roiCtrl.text,
@@ -96,15 +93,7 @@ class _FdScreenState extends State<FdScreen> {
                         "principle": prinCtrl.text,
                         "cTimes": 4
                       });
-                      tP = data.principle;
-                      CompoundCalculation calc = new CompoundCalculation(
-                        roi: data.roi,
-                        months: data.months,
-                        principle: data.principle,
-                        cTimes: data.cTimes,
-                      );
-                      tA = calc.calcMaturity();
-                      tI = tA - stringToNumber(prinCtrl.text);
+                      buildCalculateFD(data);
                     } else if (id == "RD") {
                       CalcModel data = new CalcModel.fromJson({
                         "roi": roiCtrl.text,
@@ -112,15 +101,7 @@ class _FdScreenState extends State<FdScreen> {
                         "principle": prinCtrl.text,
                         "cTimes": 12
                       });
-                      RDCalculation calc = new RDCalculation(
-                        roi: data.roi,
-                        months: data.months,
-                        principle: data.principle,
-                        cTimes: data.cTimes,
-                      );
-                      tP = calc.investment();
-                      tA = calc.calculate();
-                      tI = tA - tP;
+                      buildCalculateRD(data);
                     } else {
                       print("In progress");
                     }
@@ -170,6 +151,30 @@ class _FdScreenState extends State<FdScreen> {
     );
   }
 
+  buildCalculateFD(CalcModel data) {
+    tP = data.principle;
+    CompoundCalculation calc = new CompoundCalculation(
+      roi: data.roi,
+      months: data.months,
+      principle: data.principle,
+      cTimes: data.cTimes,
+    );
+    tA = calc.calcMaturity();
+    tI = tA - data.principle;
+  }
+
+  buildCalculateRD(CalcModel data) {
+    RDCalculation calc = new RDCalculation(
+      roi: data.roi,
+      months: data.months,
+      principle: data.principle,
+      cTimes: data.cTimes,
+    );
+    tP = calc.investment();
+    tA = calc.calculate();
+    tI = tA - tP;
+  }
+
   validateNumberField(String val, TextEditingController ctrl) {
     try {
       double.parse(val);
@@ -182,64 +187,5 @@ class _FdScreenState extends State<FdScreen> {
 
   stringToNumber(val) {
     return double.parse(val);
-  }
-}
-
-class ResultCard extends StatelessWidget {
-  const ResultCard({
-    Key key,
-    this.p,
-    this.i,
-    this.a,
-  }) : super(key: key);
-
-  final double p;
-  final double i;
-  final double a;
-
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return SizedBox(
-      width: size.width * 0.8,
-      child: Container(
-        padding: EdgeInsets.all(15),
-        decoration: BoxDecoration(
-          shape: BoxShape.rectangle,
-          border: Border.all(color: Styles.darkColor),
-          color: Styles.cardColor,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.blueGrey,
-              spreadRadius: 1,
-              blurRadius: 0.6,
-            )
-          ],
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            LabelTextAmount(
-              label: 'Deposited:',
-              amount: p,
-            ),
-            LabelTextAmount(
-              label: 'Interest:',
-              amount: i,
-            ),
-            Divider(
-              thickness: 2,
-              color: Styles.darkColor,
-            ),
-            LabelTextAmount(
-              label: 'Maturity:',
-              amount: a,
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
