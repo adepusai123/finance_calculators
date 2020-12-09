@@ -132,17 +132,22 @@ class _FdScreenState extends State<FdScreen> {
               ),
               ...showResult
                   ? [
-                      SizedBox(
-                        height: size.height * 0.06,
-                        width: size.width * 0.5,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 5),
-                          child: LabelTextAmount(
-                            label: 'EMI:',
-                            amount: tEmi,
-                          ),
-                        ),
-                      ),
+                      ...id == "EMI"
+                          ? [
+                              SizedBox(
+                                height: size.height * 0.06,
+                                width: size.width * 0.5,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 5),
+                                  child: LabelTextAmount(
+                                    label: 'EMI:',
+                                    amount: tEmi,
+                                  ),
+                                ),
+                              )
+                            ]
+                          : [],
                       SizedBox(
                         height: size.width * 0.35,
                         child: Container(
