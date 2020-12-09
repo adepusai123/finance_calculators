@@ -9,6 +9,7 @@ class CompoundCalculation {
 
   CompoundCalculation({this.principle, this.cTimes, this.months, this.roi});
   double monthsToYears() {
+    // print('_____ $principle, $months, $roi, $cTimes');
     return months / 12;
   }
 

@@ -2,10 +2,9 @@ import 'package:finance_calulator/functions/compound_calculation.dart';
 
 class RDCalculation {
   double roi;
-  int months;
+  double months;
   double principle;
   int cTimes;
-  double maturity;
   RDCalculation({
     this.roi,
     this.months,
@@ -25,5 +24,9 @@ class RDCalculation {
       value += cc.calcMaturity();
     }
     return value;
+  }
+
+  double investment() {
+    return principle * months;
   }
 }

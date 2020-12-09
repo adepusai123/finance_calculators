@@ -2,6 +2,8 @@ import 'package:finance_calulator/components/custom_button.dart';
 import 'package:finance_calulator/components/custom_text_field.dart';
 import 'package:finance_calulator/components/label_text.dart';
 import 'package:finance_calulator/functions/compound_calculation.dart';
+import 'package:finance_calulator/functions/reccurence_calculation.dart';
+import 'package:finance_calulator/models/calc_model.dart';
 import 'package:finance_calulator/models/chart_model.dart';
 import 'package:finance_calulator/utils/styles.dart';
 import 'package:flutter/material.dart';
@@ -12,9 +14,11 @@ class FdScreen extends StatefulWidget {
   const FdScreen({
     Key key,
     @required this.name,
+    @required this.id,
   }) : super(key: key);
 
   final String name;
+  final String id;
 
   @override
   _FdScreenState createState() => _FdScreenState();
@@ -33,6 +37,7 @@ class _FdScreenState extends State<FdScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String id = widget.id;
     Size size = MediaQuery.of(context).size;
     return Container(
       width: double.infinity,
@@ -65,7 +70,7 @@ class _FdScreenState extends State<FdScreen> {
                 },
               ),
               CustomNumberInput(
-                hintText: "Deposit Amount",
+                hintText: id == "FD" ? "Deposit Amount" : "Monthly Deposit",
                 controller: prinCtrl,
                 validator: (String value) {
                   if (value.isEmpty) {
@@ -84,14 +89,41 @@ class _FdScreenState extends State<FdScreen> {
                       .requestFocus(FocusNode()); // close keyboard on click
                   if (_formKey.currentState.validate()) {
                     tP = stringToNumber(prinCtrl.text);
-                    CompoundCalculation calc = new CompoundCalculation(
-                      roi: stringToNumber(roiCtrl.text),
-                      months: stringToNumber(monthsCtrl.text),
-                      principle: tP,
-                      cTimes: 4,
-                    );
-                    tA = calc.calcMaturity();
-                    tI = tA - stringToNumber(prinCtrl.text);
+                    if (id == 'FD') {
+                      CalcModel data = new CalcModel.fromJson({
+                        "roi": roiCtrl.text,
+                        "months": monthsCtrl.text,
+                        "principle": prinCtrl.text,
+                        "cTimes": 4
+                      });
+                      tP = data.principle;
+                      CompoundCalculation calc = new CompoundCalculation(
+                        roi: data.roi,
+                        months: data.months,
+                        principle: data.principle,
+                        cTimes: data.cTimes,
+                      );
+                      tA = calc.calcMaturity();
+                      tI = tA - stringToNumber(prinCtrl.text);
+                    } else if (id == "RD") {
+                      CalcModel data = new CalcModel.fromJson({
+                        "roi": roiCtrl.text,
+                        "months": monthsCtrl.text,
+                        "principle": prinCtrl.text,
+                        "cTimes": 12
+                      });
+                      RDCalculation calc = new RDCalculation(
+                        roi: data.roi,
+                        months: data.months,
+                        principle: data.principle,
+                        cTimes: data.cTimes,
+                      );
+                      tP = calc.investment();
+                      tA = calc.calculate();
+                      tI = tA - tP;
+                    } else {
+                      print("In progress");
+                    }
                     ChartData dataP =
                         new ChartData(type: "Deposite", amount: tP);
                     dataSet.add(dataP);

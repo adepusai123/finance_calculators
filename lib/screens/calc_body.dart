@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'dd_screen.dart';
 import 'emi_screen.dart';
 import 'fd_screen.dart';
-import 'rd_screen.dart';
 
 class CalcBodyScreen extends StatelessWidget {
   const CalcBodyScreen({
@@ -37,10 +36,10 @@ class CalcBodyScreen extends StatelessWidget {
   buildShowScreenById(String id) {
     switch (id) {
       case "FD":
-        return FdScreen(name: "Fixed");
+        return FdScreen(name: "Fixed", id: id);
         break;
       case "RD":
-        return RdScreen(name: "Recurrence");
+        return FdScreen(name: "Recurrence", id: id);
         break;
       case "DD":
         return DdScreen(name: "Daily");
