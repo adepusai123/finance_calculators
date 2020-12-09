@@ -8,7 +8,6 @@ class HomeScreen extends StatelessWidget {
   final List<Map<String, String>> items = [
     {"id": "FD", "name": "Fixed Deposit"},
     {"id": "RD", "name": "Recurrence Deposit"},
-    {"id": "DD", "name": "Daily Deposit"},
     {"id": "EMI", "name": "EMI"},
   ];
 
@@ -49,7 +48,7 @@ class HomeScreen extends StatelessWidget {
                 child: GridView.count(
                   crossAxisCount: 2,
                   children: List.generate(
-                    4,
+                    items.length,
                     (index) => InkWell(
                       onTap: () {
                         Navigator.push(
@@ -61,20 +60,6 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                         );
-                        // CompoundCalculation calc = new CompoundCalculation(
-                        //   roi: 11.5,
-                        //   months: 36,
-                        //   principle: 15000,
-                        //   cTimes: 4,
-                        // );
-                        // double m = calc.calcMaturity();
-                        // RDCalculation rdc = new RDCalculation(
-                        //   roi: 8,
-                        //   months: 36,
-                        //   principle: 2500,
-                        //   cTimes: 12,
-                        // );
-                        // double m = rdc.calculate();
                       },
                       child: Container(
                         margin: EdgeInsets.all(10),

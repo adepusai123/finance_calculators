@@ -9,7 +9,7 @@ class RDCalculation {
     this.roi,
     this.months,
     this.principle,
-    this.cTimes,
+    this.cTimes = 12,
   });
 
   double calculate() {
